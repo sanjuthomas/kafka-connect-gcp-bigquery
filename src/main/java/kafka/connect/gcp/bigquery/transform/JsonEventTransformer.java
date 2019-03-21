@@ -22,7 +22,7 @@ public class JsonEventTransformer implements Transformer<SinkRecord, Map<String,
 
     private final TypeReference<Map<String, Object>> typeReference = new TypeReference<Map<String, Object>>() {};
     private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    private Map<StandardSQLTypeName, Parser> parsers = new HashMap<>();
+    private Map<StandardSQLTypeName, Parser<Object, Object>> parsers = new HashMap<>();
 
     public JsonEventTransformer(Map<String, StandardSQLTypeName> fieldTypeMap) {
         this.fieldTypeMap = fieldTypeMap;
@@ -31,7 +31,7 @@ public class JsonEventTransformer implements Transformer<SinkRecord, Map<String,
     @Override
     public Map<String, ? extends Object> transform(SinkRecord record) {
 
-        final Map<String, Object> payload = OBJECT_MAPPER.convertValue(record.value(), new TypeReference<Map<String, Object>>() {});
+        final Map<String, Object> payload = OBJECT_MAPPER.convertValue(record.value(), typeReference);
         return null;
     }
     
