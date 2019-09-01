@@ -5,6 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.bigquery.BigQueryOptions;
+import com.google.cloud.bigquery.Field;
+import com.google.cloud.bigquery.Field.Mode;
 import com.google.cloud.bigquery.StandardSQLTypeName;
 import java.io.File;
 import java.io.FileInputStream;
@@ -20,23 +22,37 @@ class SchemaReaderTest {
     @BeforeEach
     void setUp() throws Exception {
         GoogleCredentials credentials;
-        final File credentialsPath = new File("src/test/resource/civic-athlete-251623-9cf9141366a2.json");
+        final File credentialsPath = new File(
+            "src/test/resource/civic-athlete-251623-9cf9141366a2.json");
         try (FileInputStream serviceAccountStream = new FileInputStream(credentialsPath)) {
             credentials = ServiceAccountCredentials.fromStream(serviceAccountStream);
         }
-        schemaReader = new SchemaReader(BigQueryOptions.newBuilder().setCredentials(credentials).build().getService());
+        schemaReader = new SchemaReader(
+            BigQueryOptions.newBuilder().setCredentials(credentials).build().getService());
     }
 
     @Test
     void shouldGetSchemaForGivenTable() {
-        final Map<String, StandardSQLTypeName> schema = schemaReader.tableSchemaFor(new TableConfig("kafkadataset", "test"));
-        System.out.println(schema);
-        assertEquals(StandardSQLTypeName.STRING, schema.get("ACCOUNT_ID"));
-        assertEquals(StandardSQLTypeName.STRING, schema.get("CLIENT_ID"));
-        assertEquals(StandardSQLTypeName.STRING, schema.get("SYMBOL"));
-        assertEquals(StandardSQLTypeName.INT64, schema.get("QUANTITY"));
-        assertEquals(StandardSQLTypeName.STRING, schema.get("TOPIC"));
-        assertEquals(StandardSQLTypeName.INT64, schema.get("PARTITION"));
-        assertEquals(StandardSQLTypeName.INT64, schema.get("OFFSET"));
+        final Map<String, Field> schema = schemaReader
+            .tableSchemaFor(new TableConfig("kafkadataset", "QuoteRequest"));
+
+        assertEquals(StandardSQLTypeName.STRING,
+            schema.get("ACCOUNT_ID").getType().getStandardType());
+        assertEquals(StandardSQLTypeName.STRING,
+            schema.get("CLIENT_ID").getType().getStandardType());
+        assertEquals(StandardSQLTypeName.STRING, schema.get("SYMBOL").getType().getStandardType());
+        assertEquals(StandardSQLTypeName.INT64, schema.get("QUANTITY").getType().getStandardType());
+        assertEquals(StandardSQLTypeName.STRING, schema.get("TOPIC").getType().getStandardType());
+        assertEquals(StandardSQLTypeName.INT64,
+            schema.get("PARTITION").getType().getStandardType());
+        assertEquals(StandardSQLTypeName.INT64, schema.get("OFFSET").getType().getStandardType());
+
+        assertEquals(Mode.NULLABLE, schema.get("OFFSET").getMode());
+        assertEquals(Mode.NULLABLE, schema.get("CLIENT_ID").getMode());
+        assertEquals(Mode.NULLABLE, schema.get("SYMBOL").getMode());
+        assertEquals(Mode.NULLABLE, schema.get("QUANTITY").getMode());
+        assertEquals(Mode.NULLABLE, schema.get("TOPIC").getMode());
+        assertEquals(Mode.NULLABLE, schema.get("PARTITION").getMode());
+        assertEquals(Mode.NULLABLE, schema.get("OFFSET").getMode());
     }
 }

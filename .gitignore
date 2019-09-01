@@ -4,6 +4,6 @@
 .project
 *bin
 dependency-reduced-pom.xml
-.idea
+.idea/
 *.iml
 src/test/resource/civic-athlete-251623-9cf9141366a2.json
