@@ -13,18 +13,29 @@ import com.google.cloud.bigquery.TableId;
 import kafka.connect.gcp.bigquery.config.TableConfig;
 
 /**
- * 
+ *
  * @author Sanju Thomas
  *
  */
 public class SchemaReader {
 
-    public static Map<String, StandardSQLTypeName> tableSchemaFor(BigQuery bigQuery, TableConfig tableConfig) {
-        Table tableMetadata = bigQuery.getTable(TableId.of(tableConfig.dataset(), tableConfig.name()), TableOption.fields(TableField.SCHEMA));
-        Map<String, StandardSQLTypeName> filedMap = new LinkedHashMap<>();
-        if (null != tableMetadata) {
+    private final BigQuery bigQuery;
+
+    public SchemaReader(final BigQuery bigQuery){
+        this.bigQuery = bigQuery;
+    }
+
+    public Map<String, StandardSQLTypeName> tableSchemaFor(final TableConfig tableConfig) {
+        final Table tableMetadata = bigQuery.getTable(TableId.of(tableConfig.dataset(), tableConfig.name()),
+            TableOption.fields(TableField.SCHEMA));
+        final Map<String, StandardSQLTypeName> filedMap = new LinkedHashMap<>();
+        if (null != tableMetadata && tableMetadata.exists()) {
             tableMetadata.getDefinition().getSchema().getFields()
-                    .forEach(f -> filedMap.put(f.getName().toUpperCase(), f.getType().getStandardType()));
+                    .forEach(f ->
+                    {
+                        System.out.println(f.getMode());
+                        filedMap.put(f.getName().toUpperCase(), f.getType().getStandardType());
+                    });
         }
         return filedMap;
     }

@@ -6,6 +6,11 @@ public class TableConfig {
     private String name;
     private String partitionColumn;
 
+    public TableConfig(String dataset, String name) {
+        this.dataset = dataset;
+        this.name = name;
+    }
+
     public TableConfig(String dataset, String name, String partitionColumn) {
         this.dataset = dataset;
         this.name = name;
@@ -15,15 +20,15 @@ public class TableConfig {
     public boolean isPartitionByDay() {
         return this.partitionColumn == null;
     }
-    
+
     public String dataset() {
         return dataset;
     }
-    
+
     public String name() {
         return name;
     }
-    
+
     public String partitionColumn() {
         return partitionColumn;
     }

@@ -12,7 +12,7 @@ import com.google.cloud.bigquery.StandardSQLTypeName;
 import kafka.connect.gcp.bigquery.parser.Parser;
 
 /**
- * 
+ *
  * @author Sanju Thomas
  *
  */
@@ -34,9 +34,9 @@ public class JsonEventTransformer implements Transformer<SinkRecord, Map<String,
         final Map<String, Object> payload = OBJECT_MAPPER.convertValue(record.value(), typeReference);
         return null;
     }
-    
+
     private Object toDatabaseType(final Map<String, Object> payload) {
-        
+
         for(String key : payload.keySet()) {
             StandardSQLTypeName sqlType = fieldTypeMap.get(key);
             if (sqlType != null) {
@@ -49,14 +49,15 @@ public class JsonEventTransformer implements Transformer<SinkRecord, Map<String,
                     return parsers.get(sqlType).parse(payload.get(key));
                 case BOOL:
                     return parsers.get(sqlType).parse(payload.get(key));
-                // no known translation at this point for the rest
+                case DATETIME:
+                    return parsers.get(sqlType).parse(payload.get(key));
+                case TIME:
+                    return parsers.get(sqlType).parse(payload.get(key));
                 case ARRAY:
                 case BYTES:
-                case DATETIME:
                 case FLOAT64:
                 case INT64:
                 case STRING:
-                case TIME:
                 default:
                     return payload.get(key);
                 }
